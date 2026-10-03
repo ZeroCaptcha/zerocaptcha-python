@@ -267,7 +267,7 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(raised.exception.task["status"], "running")
 
     def test_a_slow_read_does_not_carry_the_wait_past_its_deadline(self) -> None:
-        # Codex review finding 5: the deadline was checked only after a read finished.
+        # Regression: the deadline was checked only after a read finished.
         created = self.client.create_task(**TASK)
         self.api.read_delay = 2.0
         started = time.monotonic()
@@ -287,7 +287,7 @@ class ClientTest(unittest.TestCase):
         self.assertLess(time.monotonic() - started, 1.0)
 
     def test_an_answer_cut_short_is_retried_with_the_same_key_and_makes_one_task(self) -> None:
-        # Codex review finding 6: a body that could not be read was not retried, so a task the
+        # Regression: a body that could not be read was not retried, so a task the
         # API made surfaced as a raw error, and calling again made a second, paid task.
         self.api.cut_bodies = 1
         self.assertEqual(self.client.create_task(**TASK)["status"], "queued")
